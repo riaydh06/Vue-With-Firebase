@@ -6,8 +6,8 @@
       <button @click="addnewbook">ADD</button>
     </div>
     <div v-for="(book,index) in books" v-bind:key="book['.key']">
-      <p v-if="!edit"> {{index +1}}:  Author: {{book.author}}  Title: {{book.title}}     <span style="color:blue" @click="edit=true">Edit</span>    <span style="color:red" @click="removebook(book)">Delete</span></p>
-      <p v-else>Author:   <input type="text" v-model="book.author">  <span style="color:green" @click="editbook">Save</span>   <span style="color:red" @click="edit = false">Cancel</span></p>
+      <p v-if="!book.edit"> {{index +1}}:  Author: {{book.author}}  Title: {{book.title}}     <span style="color:blue" @click="edit(book)">Edit</span>    <span style="color:red" @click="removebook(book)">Delete</span></p>
+      <p v-else>Author:   <input type="text" v-model="book.author">  <span style="color:green" @click="save(book)">Save</span>   <span style="color:red" @click="cancel(book)">Cancel</span></p>
     </div>
 
   </div>
@@ -33,9 +33,9 @@ export default {
     return {
       newbook: {
         author: '',
-        title: ''
-      },
-      edit: false
+        title: '',
+        edit: false
+      }
     }
   },
   firebase: {
@@ -53,8 +53,15 @@ export default {
       bookref.child(book['.key']).remove()
       toastr.success('Book removed')
     },
-    editbook (book) {
-      bookref.child(book['.key']).set(this.newbook.author)
+    save (book) {
+      bookref.child(book['.key']).update({author: book.author, edit: false})
+      // bookref.child(book['.key']).set({author: book.author, edit: false})
+    },
+    edit (book) {
+      bookref.child(book['.key']).update({edit: true})
+    },
+    cancel (book) {
+      bookref.child(book['.key']).update({edit: false})
     }
   }
 }
